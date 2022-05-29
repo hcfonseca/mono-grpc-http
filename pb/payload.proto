@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/hcfonseca/testing-grpc/pb";
+option go_package = "github.com/hcfonseca/mono-grpc-http/pb";
 
 package pb;
 
@@ -11,8 +11,3 @@ message Payload {
 service PayloadService {
   rpc GetPayload (Payload) returns (Payload) {}
 }
-
-
-grpc = 13 + 15 + 13
-rest = 12 + 
-

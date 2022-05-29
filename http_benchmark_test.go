@@ -57,27 +57,7 @@ func BenchmarkHTTP2(b *testing.B) {
 }
 
 func BenchmarkGRPC(b *testing.B) {
-	caCert, err := ioutil.ReadFile("cert/localhost.crt")
-	if err != nil {
-		log.Fatal(caCert)
-	}
-
-	certPool := x509.NewCertPool()
-	if ok := certPool.AppendCertsFromPEM(caCert); !ok {
-		log.Fatal(err)
-	}
-
-	clientCert, err := tls.LoadX509KeyPair("cert/localhost.crt", "cert/localhost.decrypted.key")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	config := &tls.Config{
-		Certificates: []tls.Certificate{clientCert},
-		RootCAs:      certPool,
-	}
-
-	conn, err := grpc.Dial("localhost:9090", grpc.WithTransportCredentials(credentials.NewTLS(config)))
+	conn, err := grpc.Dial("localhost:9090", grpc.WithTransportCredentials(credentials.NewTLS(initTLSGRPCConfig())))
 	if err != nil {
 		log.Fatalf("Dial failed: %v", err)
 	}
@@ -104,6 +84,28 @@ func initTLSConfig() *tls.Config {
 
 	return &tls.Config{
 		RootCAs: caPool,
+	}
+}
+
+func initTLSGRPCConfig() *tls.Config {
+	caCert, err := ioutil.ReadFile("cert/localhost.crt")
+	if err != nil {
+		log.Fatal(caCert)
+	}
+
+	certPool := x509.NewCertPool()
+	if ok := certPool.AppendCertsFromPEM(caCert); !ok {
+		log.Fatal(err)
+	}
+
+	clientCert, err := tls.LoadX509KeyPair("cert/localhost.crt", "cert/localhost.decrypted.key")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &tls.Config{
+		Certificates: []tls.Certificate{clientCert},
+		RootCAs:      certPool,
 	}
 }
 
